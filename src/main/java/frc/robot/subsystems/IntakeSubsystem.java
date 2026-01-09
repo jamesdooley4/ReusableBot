@@ -49,14 +49,14 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command intake() {
         return Commands.sequence(
             Commands.runOnce(this::deployIntake, this),
-            Commands.run(() -> runIntake(), this)
+            run(() -> runIntake())
                 .until(this::hasPiece),
             Commands.runOnce(this::maintainHold, this)
         );
     }
 
     public Command outtake(double timeoutSeconds) {
-        return Commands.run(() -> runOuttake(), this)
+        return run(() -> runOuttake())
             .withTimeout(timeoutSeconds)
             .until(() -> !hasPiece());
     }
@@ -64,7 +64,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command autoIntake() {
         return Commands.sequence(
             Commands.runOnce(this::deployIntake, this),
-            Commands.run(() -> runIntake(), this)
+            run(() -> runIntake())
                 .until(this::hasPiece),
             Commands.runOnce(this::maintainHold, this),
             Commands.runOnce(this::stowIntake, this)
@@ -72,7 +72,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command hold() {
-        return Commands.run(() -> maintainHold(), this);
+        return run(() -> maintainHold());
     }
 
     public Command stow() {
@@ -84,8 +84,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command clearJam() {
         return Commands.sequence(
-            Commands.run(() -> runOuttake(), this).withTimeout(0.5),
-            Commands.run(() -> runIntake(), this).withTimeout(0.5)
+            run(() -> runOuttake()).withTimeout(0.5),
+            run(() -> runIntake()).withTimeout(0.5)
         );
     }
 }
