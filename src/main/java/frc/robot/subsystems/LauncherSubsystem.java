@@ -32,8 +32,8 @@ public class LauncherSubsystem extends SubsystemBase {
     /**
      * Helper: is hood at target angle within tolerance
      */
-    public boolean atHoodAngle(double target, double tolerance) {
-        return Math.abs(io.getHoodPositionRadians() - target) <= tolerance;
+    public boolean atHoodAngle(double tolerance) {
+        return Math.abs(io.getHoodPositionRadians() - targetHoodAngle) <= tolerance;
     }
 
     public void setTargetVelocity(double radPerSec) {
@@ -81,7 +81,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public Command setHoodAngleCommand(double targetRadians, double tolerance) {
         return Commands.sequence(
             runOnce(() -> setHoodAngle(targetRadians)),
-            run(() -> {}).until(() -> atHoodAngle(targetRadians, tolerance)),
+            run(() -> {}).until(() -> atHoodAngle(tolerance)),
             runOnce(() -> {})
         );
     }
