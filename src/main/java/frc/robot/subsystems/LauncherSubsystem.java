@@ -5,6 +5,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LauncherSubsystem extends SubsystemBase {
+    public interface ShotProfileProvider {
+        boolean hasTarget();
+        double getRecommendedVelocityRadPerSec();
+        double getRecommendedHoodAngleRadians();
+    }
+
     public enum State {
         IDLE,
         SPINNING_UP,
@@ -94,10 +100,14 @@ public class LauncherSubsystem extends SubsystemBase {
      * Auto shot: given functions (vision->hood angle, vision->velocity) and a
      * distance value, configure hood and flywheel, spin up, then shoot when ready.
      */
-    public Command autoShotCommand(double visionDistanceMeters, java.util.function.DoubleUnaryOperator distanceToHoodAngle,
-            java.util.function.DoubleUnaryOperator distanceToFlywheelVelocity, IndexSubsystem indexSubsystem, double speedTolerance) {
-        double hoodAngle = distanceToHoodAngle.applyAsDouble(visionDistanceMeters);
-        double flywheelVel = distanceToFlywheelVelocity.applyAsDouble(visionDistanceMeters);
+    public Command autoShotCommand(ShotProfileProvider profileProvider, IndexSubsystem indexSubsystem, double speedTolerance) {
+        // If the provider doesn't have a target, return a no-op immediate command.
+        if (profileProvider == null || !profileProvider.hasTarget()) {
+            return runOnce(() -> {});
+        }
+
+        double hoodAngle = profileProvider.getRecommendedHoodAngleRadians();
+        double flywheelVel = profileProvider.getRecommendedVelocityRadPerSec();
 
         return Commands.sequence(
             setHoodAngleCommand(hoodAngle, 0.02),
