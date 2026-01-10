@@ -1,9 +1,12 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class TurretSubsystem extends SubsystemBase {
     public interface TurretTargetProvider {
@@ -24,7 +27,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final TurretIO io;
     private State state = State.IDLE;
-
     // Local homed flag: some IO implementations may not provide a setter for homing;
     // keep track locally once we home and/or zero the encoder.
     private boolean homed = false;
@@ -37,6 +39,15 @@ public class TurretSubsystem extends SubsystemBase {
         this.io = io;
         this.minAngle = minAngle;
         this.maxAngle = maxAngle;
+    }
+
+    /**
+     * Get the pivot simulation for testing.
+     * 
+     * @return The pivot simulation model
+     */
+    public SingleJointedArmSim getSimulation() {
+        return io.getSimulation();
     }
 
     public void setManualVoltage(double volts) {

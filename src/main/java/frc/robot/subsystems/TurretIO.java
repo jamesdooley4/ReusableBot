@@ -1,6 +1,11 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+
 public interface TurretIO {
+    // Simulation
+    public SingleJointedArmSim getSimulation();
+
     // Control
     void setVoltage(double volts);
     void stop();
