@@ -8,16 +8,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 // import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 // import frc.robot.subsystems.IndexSubsystem;
-// import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.LauncherIOImp;
+import frc.robot.subsystems.LauncherSubsystem;
 // import frc.robot.subsystems.TurretSubsystem;
 
 public class RobotContainer {
+  LauncherSubsystem launcherSubsystem = new LauncherSubsystem(new LauncherIOImp());
+
   public RobotContainer() {
     configureBindings();
   }
 
   private void configureBindings() {
-    // LauncherSubsystem launcherSubsystem = new LauncherSubsystem(null);
     // TurretSubsystem turretSubsystem = new TurretSubsystem(null);
     // Object targetProvider = null;
     // IndexSubsystem indexSubsystem = new IndexSubsystem(null);

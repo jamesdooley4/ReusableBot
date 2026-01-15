@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import frc.util.NtTunableDouble;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.networktables.TimestampedDouble;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -10,7 +13,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public interface ShotProfileProvider {
         boolean hasTarget();
 
-        double getRecommendedVelocityRadPerSec();
+        double getRecommendedVelocityRPM();
 
         double getRecommendedHoodAngleRadians();
     }
@@ -26,33 +29,36 @@ public class LauncherSubsystem extends SubsystemBase {
     private final LauncherIO io;
     private State state = State.IDLE;
 
-    private double targetVelocity = 0.0;
-    private double targetHoodAngle = 0.0;
+    private NtTunableDouble targetVelocity;
+    private long lastVelocityUpdateTime = 0;
+    private NtTunableDouble targetHoodAngle;
 
     public LauncherSubsystem(LauncherIO io) {
         this.io = io;
+        targetVelocity = new NtTunableDouble("/launcher/targetVelocity", 0.0);
+        targetHoodAngle = new NtTunableDouble("/launcher/targetHoodAngle", 0.0);
     }
 
     /**
      * Helper: is hood at target angle within tolerance
      */
     public boolean atHoodAngle(double tolerance) {
-        return Math.abs(io.getHoodPositionRadians() - targetHoodAngle) <= tolerance;
+        return Math.abs(io.getHoodPositionRadians() - targetHoodAngle.get()) <= tolerance;
     }
 
-    public void setTargetVelocity(double radPerSec) {
-        targetVelocity = radPerSec;
+    public void setTargetVelocity(double rpm) {
+        targetVelocity.set(rpm);
         state = State.SPINNING_UP;
-        io.setFlywheelVelocity(radPerSec);
+        io.setFlywheelVelocity(rpm);
     }
 
     public void setHoodAngle(double radians) {
-        targetHoodAngle = radians;
+        targetHoodAngle.set(radians);
         io.setHoodPositionRadians(radians);
     }
 
     public boolean atSpeed(double tolerance) {
-        return Math.abs(io.getFlywheelVelocityRadPerSec() - targetVelocity) <= tolerance;
+        return Math.abs(io.getFlywheelVelocityRPM() - targetVelocity.get()) <= tolerance;
     }
 
     public boolean onTarget() {
@@ -76,9 +82,9 @@ public class LauncherSubsystem extends SubsystemBase {
     // --- Command factories ---
 
     /** Spin up flywheel to target velocity and finish when at speed. */
-    public Command spinUpCommand(double velocityRadPerSec, double tolerance) {
+    public Command spinUpCommand(double rpm, double tolerance) {
         return Commands.sequence(
-                runOnce(() -> setTargetVelocity(velocityRadPerSec)),
+                runOnce(() -> setTargetVelocity(rpm)),
                 // Wait until at speed
                 run(() -> {
                 }).until(() -> atSpeed(tolerance)),
@@ -117,7 +123,7 @@ public class LauncherSubsystem extends SubsystemBase {
         }
 
         double hoodAngle = profileProvider.getRecommendedHoodAngleRadians();
-        double flywheelVel = profileProvider.getRecommendedVelocityRadPerSec();
+        double flywheelVel = profileProvider.getRecommendedVelocityRPM();
 
         return Commands.sequence(
                 setHoodAngleCommand(hoodAngle, 0.02),
@@ -162,5 +168,14 @@ public class LauncherSubsystem extends SubsystemBase {
         }
         steps.add(runOnce(() -> io.stopFlywheel()));
         return Commands.sequence(steps.toArray(new Command[0]));
+    }
+
+    @Override
+    public void periodic() {
+        if (targetVelocity.hasChangedSince(lastVelocityUpdateTime)) {
+            TimestampedDouble currentTarget = targetVelocity.getAtomic();
+            io.setFlywheelVelocity(currentTarget.value);
+            lastVelocityUpdateTime = currentTarget.timestamp;
+        }
     }
 }

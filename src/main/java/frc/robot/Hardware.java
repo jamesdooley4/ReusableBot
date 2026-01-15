@@ -42,6 +42,8 @@ public class Hardware {
   // launcher [55-59]
   public static final int LAUNCHER_MOTOR_LEFT_ID = 55;
   public static final int LAUNCHER_MOTOR_RIGHT_ID = 56;
+  // Dedicated hood motor (separate from flywheel motors)
+  public static final int LAUNCHER_HOOD_MOTOR_ID = 57;
 
   // elevator zero button DIO
   public static final int ELEVATOR_ZERO_BUTTON = 0;
