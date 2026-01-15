@@ -13,6 +13,7 @@ public class TurretSubsystem extends SubsystemBase {
         // Angle offset from current turret angle to target, in radians.
         // Positive = turn CCW, negative = turn CW (or vice versa, but consistent).
         boolean hasTarget();
+
         double getTargetOffsetRadians();
     }
 
@@ -27,7 +28,8 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final TurretIO io;
     private State state = State.IDLE;
-    // Local homed flag: some IO implementations may not provide a setter for homing;
+    // Local homed flag: some IO implementations may not provide a setter for
+    // homing;
     // keep track locally once we home and/or zero the encoder.
     private boolean homed = false;
 
@@ -93,6 +95,10 @@ public class TurretSubsystem extends SubsystemBase {
         moveToAngle(targetAngle);
     }
 
+    public boolean onTarget() {
+        return true;
+    }
+
     // --- Command factories ---
 
     /**
@@ -105,26 +111,30 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     /**
-     * Move to a fixed angle (radians). Completes when {@link #atAngle(double,double)}
+     * Move to a fixed angle (radians). Completes when
+     * {@link #atAngle(double,double)}
      * is true for the given tolerance.
      */
     public Command moveToAngleCommand(double targetRadians, double tolerance) {
         return Commands.sequence(
-            runOnce(() -> moveToAngle(targetRadians)),
-            // busy-wait until at angle
-            run(() -> {}).until(() -> atAngle(targetRadians, tolerance)),
-            runOnce(this::stop)
-        );
+                runOnce(() -> moveToAngle(targetRadians)),
+                // busy-wait until at angle
+                run(() -> {
+                }).until(() -> atAngle(targetRadians, tolerance)),
+                runOnce(this::stop));
     }
 
     /**
-     * Track a dynamic target provided by a {@link TurretTargetProvider}. Continuously
-     * updates the turret target. Ends when the command times out or when the provider
+     * Track a dynamic target provided by a {@link TurretTargetProvider}.
+     * Continuously
+     * updates the turret target. Ends when the command times out or when the
+     * provider
      * reports no target for {@code noTargetMaxCycles} scheduler cycles.
      *
-     * @param provider the target provider
-     * @param timeoutSeconds overall timeout in seconds
-     * @param noTargetMaxCycles number of consecutive cycles without a target before ending
+     * @param provider          the target provider
+     * @param timeoutSeconds    overall timeout in seconds
+     * @param noTargetMaxCycles number of consecutive cycles without a target before
+     *                          ending
      */
     public Command trackTargetCommand(TurretTargetProvider provider, double timeoutSeconds, int noTargetMaxCycles) {
         final int[] missCount = new int[1];
@@ -137,20 +147,24 @@ public class TurretSubsystem extends SubsystemBase {
             }
         }).until(() -> missCount[0] >= noTargetMaxCycles).withTimeout(timeoutSeconds);
 
-    return Commands.sequence(tracking, runOnce(this::stop));
+        return Commands.sequence(tracking, runOnce(this::stop));
     }
 
     /**
      * Homing command. Drives slowly toward a limit switch (forward or reverse).
-     * When a limit switch is triggered the encoder is zeroed via {@link TurretIO#setPositionRadians(double)}
-     * (if implemented by the IO) and a local homed flag is set. Ends when homed or on timeout.
+     * When a limit switch is triggered the encoder is zeroed via
+     * {@link TurretIO#setPositionRadians(double)}
+     * (if implemented by the IO) and a local homed flag is set. Ends when homed or
+     * on timeout.
      *
-     * @param driveVoltage small voltage to drive toward the limit switch (sign used to pick direction)
+     * @param driveVoltage   small voltage to drive toward the limit switch (sign
+     *                       used to pick direction)
      * @param timeoutSeconds overall timeout
      */
     public Command homeCommand(double driveVoltage, double timeoutSeconds) {
         final boolean[] driveTowardReverse = new boolean[1];
-        // decide direction: if current angle nearer maxAngle, drive positive (forward), else drive negative
+        // decide direction: if current angle nearer maxAngle, drive positive (forward),
+        // else drive negative
         driveTowardReverse[0] = Math.abs(getAngle() - maxAngle) > Math.abs(getAngle() - minAngle);
 
         Command drive = run(() -> {

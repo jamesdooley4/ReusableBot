@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,11 +49,21 @@ public class IndexSubsystem extends SubsystemBase {
         io.stopConveyor();
     }
 
-    public boolean hasPieceAtEntry() { return io.entrySensorTriggered(); }
-    public boolean hasPieceAtMid() { return io.midSensorTriggered(); }
-    public boolean hasPieceAtExit() { return io.exitSensorTriggered(); }
+    public boolean hasPieceAtEntry() {
+        return io.entrySensorTriggered();
+    }
 
-    public State getState() { return state; }
+    public boolean hasPieceAtMid() {
+        return io.midSensorTriggered();
+    }
+
+    public boolean hasPieceAtExit() {
+        return io.exitSensorTriggered();
+    }
+
+    public State getState() {
+        return state;
+    }
 
     public Command autoIndex() {
         return run(() -> {
@@ -65,20 +77,17 @@ public class IndexSubsystem extends SubsystemBase {
         }).until(() -> hasPieceAtEntry() && hasPieceAtMid() && hasPieceAtExit());
     }
 
-    public Command feedToShooter(Command shooterReadyCommand) {
-        return Commands.sequence(
-            shooterReadyCommand,
-            run(() -> feedToShooter())
-                .until(() -> !hasPieceAtExit()),
-            Commands.runOnce(this::stop, this)
-        );
+    public Command feedToLauncher(BooleanSupplier shooterReady) {
+        return Commands.waitUntil(shooterReady).andThen(
+                run(() -> feedToShooter())
+                        .until(() -> !hasPieceAtExit()),
+                Commands.runOnce(this::stop, this));
     }
 
     public Command clearJam() {
         return Commands.sequence(
-            run(() -> reverse()).withTimeout(0.5),
-            run(() -> intake()).withTimeout(0.5)
-        );
+                run(() -> reverse()).withTimeout(0.5),
+                run(() -> intake()).withTimeout(0.5));
     }
 
     public Command holdPosition() {
@@ -87,16 +96,15 @@ public class IndexSubsystem extends SubsystemBase {
 
     public Command intakeToIndexPipeline(IntakeSubsystem intakeSubsystem) {
         return Commands.parallel(
-            intakeSubsystem.intake(),
-            run(() -> {
-                if (!hasPieceAtMid() && hasPieceAtEntry()) {
-                    intake();
-                } else if (!hasPieceAtExit() && hasPieceAtMid()) {
-                    index();
-                } else {
-                    stop();
-                }
-            }).until(() -> hasPieceAtEntry() && hasPieceAtMid() && hasPieceAtExit())
-        );
+                intakeSubsystem.intake(),
+                run(() -> {
+                    if (!hasPieceAtMid() && hasPieceAtEntry()) {
+                        intake();
+                    } else if (!hasPieceAtExit() && hasPieceAtMid()) {
+                        index();
+                    } else {
+                        stop();
+                    }
+                }).until(() -> hasPieceAtEntry() && hasPieceAtMid() && hasPieceAtExit()));
     }
 }
