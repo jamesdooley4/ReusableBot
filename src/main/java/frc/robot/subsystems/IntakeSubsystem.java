@@ -40,15 +40,34 @@ public class IntakeSubsystem extends SubsystemBase {
         io.stopRoller();
     }
 
-    private void deployIntake() { io.setDeployed(true); }
-    private void stowIntake() { io.setDeployed(false); }
+    // (legacy simple setters removed — use command factories below)
+
+    // Command factories for deploying/stowing using IO metrics (current + velocity)
+    public Command deployIntakeCommand() {
+        return Commands.sequence(
+            // Run deploy voltage until current spike + near-zero velocity or timeout
+            run(() -> io.setDeployVoltage(6.0))
+                .until(() -> io.getDeployCurrent() > 10.0 && Math.abs(io.getDeployVelocityRadPerSec()) < 0.5)
+                .withTimeout(3.0),
+            runOnce(() -> io.stopDeployMotor())
+        );
+    }
+
+    public Command stowIntakeCommand() {
+        return Commands.sequence(
+            run(() -> io.setDeployVoltage(-7.0))
+                .until(() -> io.getDeployCurrent() > 10.0 && Math.abs(io.getDeployVelocityRadPerSec()) < 0.5)
+                .withTimeout(3.0),
+            runOnce(() -> io.stopDeployMotor())
+        );
+    }
 
     public boolean hasPiece() { return io.hasGamePiece(); }
     public State getState() { return state; }
 
     public Command intake() {
         return Commands.sequence(
-            Commands.runOnce(this::deployIntake, this),
+            deployIntakeCommand(),
             run(() -> runIntake())
                 .until(this::hasPiece),
             Commands.runOnce(this::maintainHold, this)
@@ -63,11 +82,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command autoIntake() {
         return Commands.sequence(
-            Commands.runOnce(this::deployIntake, this),
+            deployIntakeCommand(),
             run(() -> runIntake())
                 .until(this::hasPiece),
             Commands.runOnce(this::maintainHold, this),
-            Commands.runOnce(this::stowIntake, this)
+            stowIntakeCommand()
         );
     }
 
@@ -78,7 +97,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command stow() {
         return Commands.sequence(
             Commands.runOnce(this::stopRoller, this),
-            Commands.runOnce(this::stowIntake, this)
+            stowIntakeCommand()
         );
     }
 

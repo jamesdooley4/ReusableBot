@@ -16,9 +16,6 @@ public class IntakeIOImp implements IntakeIO {
     private final TalonFX rollerMotor;
     private final DigitalInput beamSensor;
 
-    // Track last commanded deploy state; IO doesn't try to read a position encoder here.
-    private boolean deployed = false;
-
     public IntakeIOImp() {
         deployMotor = new TalonFX(Hardware.INTAKE_DEPLOY_MOTOR_ID);
         rollerMotor = new TalonFX(Hardware.INTAKE_SPINNY_MOTOR_ID);
@@ -55,20 +52,25 @@ public class IntakeIOImp implements IntakeIO {
         rollerMotor.stopMotor();
     }
 
+    // Open-loop: set deploy motor voltage
     @Override
-    public void setDeployed(boolean deployed) {
-        // Simple open-loop deploy/retract command. Tune voltages as needed.
-        if (deployed) {
-            deployMotor.setControl(new VoltageOut(6.0));
-        } else {
-            deployMotor.setControl(new VoltageOut(-6.0));
-        }
-        this.deployed = deployed;
+    public void setDeployVoltage(double volts) {
+        deployMotor.setControl(new VoltageOut(volts));
     }
 
     @Override
-    public boolean isDeployed() {
-        return deployed;
+    public void stopDeployMotor() {
+        deployMotor.stopMotor();
+    }
+
+    @Override
+    public double getDeployCurrent() {
+        return deployMotor.getSupplyCurrent().getValue().in(Units.Amps);
+    }
+
+    @Override
+    public double getDeployVelocityRadPerSec() {
+        return deployMotor.getVelocity().getValue().in(Units.RadiansPerSecond);
     }
 
     @Override

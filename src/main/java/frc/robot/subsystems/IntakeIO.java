@@ -6,8 +6,15 @@ public interface IntakeIO {
     void stopRoller();
 
     // Deployment (optional)
-    default void setDeployed(boolean deployed) {}
-    default boolean isDeployed() { return true; }
+    // Set deploy motor open-loop voltage (positive deploy, negative stow)
+    default void setDeployVoltage(double volts) {}
+
+    // Stop the deploy motor
+    default void stopDeployMotor() {}
+
+    // Metrics for deploy monitoring
+    default double getDeployCurrent() { return 0.0; } // amps
+    default double getDeployVelocityRadPerSec() { return 0.0; }
 
     // Sensors
     default boolean hasGamePiece() { return false; }
