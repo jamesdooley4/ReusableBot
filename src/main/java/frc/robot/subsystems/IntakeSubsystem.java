@@ -22,7 +22,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private void runIntake() {
         state = State.INTAKING;
-        io.setRollerVoltage(6.0);
+        io.setRollerVoltage(9.0);
     }
 
     private void runOuttake() {
@@ -87,5 +87,9 @@ public class IntakeSubsystem extends SubsystemBase {
             run(() -> runOuttake()).withTimeout(0.5),
             run(() -> runIntake()).withTimeout(0.5)
         );
+    }
+
+    public Command stop() {
+        return runOnce(() -> stopRoller());
     }
 }

@@ -31,8 +31,8 @@ public class Hardware {
   public static final int GRIPPER_MOTOR_ID = 40;
 
   // intake [45-49]
-  public static final int INTAKE_SPINNY_MOTOR = 45;
-  public static final int INTAKE_SENSOR = 46;
+  public static final int INTAKE_SPINNY_MOTOR_ID = 45;
+  public static final int INTAKE_DEPLOY_MOTOR_ID = 46;
 
   // climb [50-54]
   public static final int CLIMB_PIVOT_MOTOR_LEFT_ID = 50;
@@ -45,7 +45,7 @@ public class Hardware {
   // Dedicated hood motor (separate from flywheel motors)
   public static final int LAUNCHER_HOOD_MOTOR_ID = 57;
 
-  // elevator zero button DIO
+  // DIO sensors
   public static final int ELEVATOR_ZERO_BUTTON = 0;
-
+  public static final int INTAKE_SENSOR = 1;
 }
