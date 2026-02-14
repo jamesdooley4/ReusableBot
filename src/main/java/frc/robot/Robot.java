@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -12,9 +17,13 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  StructArrayPublisher<Pose2d> arrowPublisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("lines/arrow1", Pose2d.struct).publish();
+
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    arrowPublisher.set(new Pose2d[] {Pose2d.kZero, Pose2d.kZero});
   }
 
   @Override
@@ -54,7 +63,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    Pose2d pose1 = new Pose2d(1.0, 2.0, Rotation2d.kZero);
+    Pose2d pose2 = new Pose2d(3.0, 4.0 + Math.sin(DriverStation.getMatchTime()), Rotation2d.kZero);
+    var array = new Pose2d[] {pose1, pose2};
+    arrowPublisher.set(array, 0);
+  }
 
   @Override
   public void teleopExit() {}
