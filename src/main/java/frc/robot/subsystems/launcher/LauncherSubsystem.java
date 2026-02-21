@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.launcher;
 
 import frc.util.NtTunableDouble;
 import java.util.function.DoubleSupplier;
@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.index.IndexSubsystem;
 
 public class LauncherSubsystem extends SubsystemBase {
     public interface ShotProfileProvider {
@@ -28,7 +29,7 @@ public class LauncherSubsystem extends SubsystemBase {
 
     private final LauncherIO io;
     private State state = State.IDLE;
-
+    
     private NtTunableDouble targetVelocity;
     private long lastVelocityUpdateTime = 0;
     private NtTunableDouble targetHoodAngle;
@@ -116,7 +117,6 @@ public class LauncherSubsystem extends SubsystemBase {
      */
     public Command autoShotCommand(ShotProfileProvider profileProvider, IndexSubsystem indexSubsystem,
             double speedTolerance) {
-        // If the provider doesn't have a target, return a no-op immediate command.
         if (profileProvider == null || !profileProvider.hasTarget()) {
             return runOnce(() -> {
             });

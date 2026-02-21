@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.gripper;
 
 public interface GripperIO {
     // Roller or motorized gripper

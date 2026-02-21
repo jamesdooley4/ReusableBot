@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
+
+// Interface for Intake IO implementations (hardware or simulation)
 
 public interface IntakeIO {
     // Roller control

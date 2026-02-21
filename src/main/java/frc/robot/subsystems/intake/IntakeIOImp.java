@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
+
+import frc.robot.Hardware;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -8,7 +10,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.units.Units;
-import frc.robot.Hardware;
+
+
+// Hardware implementation of IntakeIO for the real robot
 
 public class IntakeIOImp implements IntakeIO {
 

@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.wrist;
 
 public interface WristIO {
     void setWristVoltage(double volts);

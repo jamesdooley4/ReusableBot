@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.gripper;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -50,8 +50,6 @@ public class GripperSubsystem extends SubsystemBase {
     public State getState() {
         return state;
     }
-
-    // --- Command factories ---
 
     /**
      * Run the gripper intake until a piece is detected, then hold.

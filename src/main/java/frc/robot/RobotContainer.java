@@ -8,11 +8,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.IntakeIOImp;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeIOImp;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.LauncherIOImp;
-import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.launcher.LauncherIOImp;
+import frc.robot.subsystems.launcher.LauncherSubsystem;
 
 public class RobotContainer {
   Mechanism2d robotMechanism = new Mechanism2d(Units.inchesToMeters(30), Units.inchesToMeters(30));

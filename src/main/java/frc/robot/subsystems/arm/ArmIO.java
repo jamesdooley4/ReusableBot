@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.arm;
+
+// Interface for Arm IO implementations (hardware or simulation)
 
 public interface ArmIO {
     // Control

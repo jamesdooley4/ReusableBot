@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.climb;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -76,7 +76,6 @@ public class ClimbSubsystem extends SubsystemBase {
         return run(() -> {
             double tilt = tiltSupplier.getAsDouble();
             if (tilt > deadband) {
-                // tilt positive -> lower one side: apply small positive winch
                 io.setWinchVoltage(adjustVolts);
             } else if (tilt < -deadband) {
                 io.setWinchVoltage(-adjustVolts);
@@ -145,7 +144,6 @@ public class ClimbSubsystem extends SubsystemBase {
 
     public void balance() {
         state = State.BALANCING;
-        // Implementation: small adjustments based on gyro or tilt sensor
     }
 
     public void lock() {

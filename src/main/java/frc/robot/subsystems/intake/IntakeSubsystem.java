@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,8 +40,6 @@ public class IntakeSubsystem extends SubsystemBase {
         io.stopRoller();
     }
 
-    // (legacy simple setters removed — use command factories below)
-
     // Command factories for deploying/stowing using IO metrics (current + velocity)
     public Command deployIntakeCommand() {
         return Commands.sequence(
@@ -70,7 +68,7 @@ public class IntakeSubsystem extends SubsystemBase {
             deployIntakeCommand(),
             run(() -> runIntake())
                 .until(this::hasPiece),
-            Commands.runOnce(this::maintainHold, this)
+            runOnce(() -> maintainHold())
         );
     }
 
@@ -85,7 +83,7 @@ public class IntakeSubsystem extends SubsystemBase {
             deployIntakeCommand(),
             run(() -> runIntake())
                 .until(this::hasPiece),
-            Commands.runOnce(this::maintainHold, this),
+            runOnce(() -> maintainHold()),
             stowIntakeCommand()
         );
     }
@@ -96,7 +94,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command stow() {
         return Commands.sequence(
-            Commands.runOnce(this::stopRoller, this),
+            runOnce(() -> stopRoller()),
             stowIntakeCommand()
         );
     }

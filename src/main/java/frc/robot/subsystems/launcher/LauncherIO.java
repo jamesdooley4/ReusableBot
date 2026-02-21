@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.launcher;
 
 public interface LauncherIO {
     // Flywheel control
